@@ -1,4 +1,5 @@
 require('dotenv').config(); // initialize dotenv
+import { calendar } from './calender.js';
 
 // Discord bot setup
 const Discord = require('discord.js');
@@ -20,12 +21,17 @@ function return_text(text){
     }
 }
 
+// Initiate bot
 bot.on('ready', ()=>{
     console.log(`Logged in as ${bot.user.tag}!`);
 });
 
+// Check for message
 bot.on('messageCreate', async (msg) => {
-    const botWasMentioned = msg.content.startsWith("!schedule")
+
+    if (msg.author.bot) return;
+
+    const botWasMentione = msg.content.startsWith("!schedule")
 
     console.log(botWasMentioned);
 
