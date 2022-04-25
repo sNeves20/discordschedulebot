@@ -1,8 +1,29 @@
 require('dotenv').config(); // initialize dotenv
-import { calendar } from './calender.js';
+const calendar = require('./calender.js');
+const cron = require('node-cron');
+
+async function showPossibleSchedule(commandArray){
+    let dayOfWeek = commandArray[0];
+    let amountOfDays = commandArray[1];
+
+    if(!(dayOfWeek in calendar.weekDays)){
+
+        throw "Invalid day of the week inserted";
+    }
+    let possibleDays = (await calendar.getNextAvailableDates(calender.weekDays[dayOfWeek], amountOfDays));
+    
+    let response = "Select one of the following days:\n";
+    for(i = 0; i < possibleDays.length; i++){
+        response +=`> ${i+1 } - ${possibleDays[i]}\n`;
+    }
+
+    console.log(response)
+    return response;
+}
 
 // Discord bot setup
 const Discord = require('discord.js');
+const calender = require('./calender.js');
 const bot = new Discord.Client({
     intents: [
         "GUILDS",
@@ -11,45 +32,42 @@ const bot = new Discord.Client({
     ]
 });
 
-function return_text(text){
-
-    if (text === "schedule"){
-        return "This is working";
-    }
-    else {
-        return "This is also working";
-    }
-}
-
 // Initiate bot
-bot.on('ready', ()=>{
+bot.on('ready', () => {
+
+    const channel = bot.channels.cache.get('966004233931481149'); // Announcement Channel ID
     console.log(`Logged in as ${bot.user.tag}!`);
 });
 
 // Check for message
 bot.on('messageCreate', async (msg) => {
 
+    // Ignoring if the message author is the bot
     if (msg.author.bot) return;
 
-    const botWasMentione = msg.content.startsWith("!schedule")
-
-    console.log(botWasMentioned);
+    // Checking if the bot is being commanded
+    const botWasMentioned = msg.content.startsWith("!schedule");
 
     if (botWasMentioned) {
-        try {
-            await msg.channel.createMessage('Present');
-        } catch (err) {
-            // There are various reasons why sending a message may fail.
-            // The API might time out or choke and return a 5xx status,
-            // or the bot may not have permission to send the
-            // message (403 status).
-            console.warn('Failed to respond to mention.');
-            console.warn(err);
+        let command = msg.content.split(" ");
+        switch (command[1]){
+            case "day":
+                console.log("\t Working on day command")
+                showPossibleSchedule(command.slice(2)).then((response) => {
+                    msg.reply(response);
+                });
+                break;
+            case "lock":
+                console.log("\tLocking Data");
+                
+            default:
+                msg.reply("The command you inserted is not supported.");
+                break;
         }
     }
  });
 
- bot.on('error', err => {
+bot.on('error', err => {
      console.warn(err);
  });
 
