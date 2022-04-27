@@ -1,5 +1,5 @@
 require('dotenv').config(); // initialize dotenv
-const calendar = require('./calender.js');
+const calendar = require('./commands/calender.js');
 const cron = require('node-cron');
 
 async function showPossibleSchedule(commandArray){
@@ -23,12 +23,13 @@ async function showPossibleSchedule(commandArray){
 
 // Discord bot setup
 const Discord = require('discord.js');
-const calender = require('./calender.js');
+const calender = require('./commands/calender.js');
 const bot = new Discord.Client({
     intents: [
         "GUILDS",
         "GUILD_MESSAGES",
         "GUILD_MEMBERS",
+        "GUILD_MESSAGE_REACTIONS"
     ]
 });
 
@@ -59,7 +60,7 @@ bot.on('messageCreate', async (msg) => {
                 break;
             case "lock":
                 console.log("\tLocking Data");
-                
+
             default:
                 msg.reply("The command you inserted is not supported.");
                 break;
