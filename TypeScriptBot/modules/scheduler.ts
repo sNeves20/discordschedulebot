@@ -3,12 +3,6 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-type Response = {
-    status: number,
-    statusText: string
-}
-
-var response: Response ={}
 // Provide the required configuration
 const json = process.env.CREDENTIALS
 var CREDENTIALS = null;
@@ -91,7 +85,7 @@ async function createEvent (appointmentInfo: any){
 export async function insertEvent (event: any){
     try {
         console.log("Requesting response")
-        let response = calendar.events.insert({
+        let response = await calendar.events.insert({
             auth: auth,
             calendarId: calendarId,
             requestBody: event
@@ -123,15 +117,18 @@ export async function getEvents (dateTimeStart: string, dateTimeEnd: string) {
 }
 
 export  async function getNextAvailableDates (scheduledDay: any, dayTimeFrame: any){
+
     let nextAvailableDays = [];
     for(let i=1; i < dayTimeFrame; i++){
 
         var day = new Date(new Date().setDate(new Date().getDate() + i));
 
-        if (day.getDay() == scheduledDay){
-            nextAvailableDays.push(`${day.getFullYear()}-${datePadding(day.getMonth()+1)}-${datePadding(day.getDate())}`);
+        
+        if (day.getDay() == parseInt(weekDays[scheduledDay])){
+            nextAvailableDays.push(`${datePadding(day.getDate())}-${datePadding(day.getMonth()+1)}-${day.getFullYear()}`);
         }
     }
+
     return nextAvailableDays;
 }
 

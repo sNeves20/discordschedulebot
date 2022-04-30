@@ -1,6 +1,6 @@
 import DiscordJS, { Intents } from 'discord.js';
 import dotenv from 'dotenv';
-//import {insertEvent, getNextAvailableDates} from './modules/scheduler';
+import {insertEvent, getNextAvailableDates} from './modules/scheduler';
 
 dotenv.config()
 
@@ -52,10 +52,7 @@ client.on('ready', () =>{
 
 client.on('interactionCreate', async (interaction) => {
 
-    console.log("Hello World");
-
     if(!interaction.isCommand()){
-        console.log("the fuck?")
         return
     }
 
@@ -66,7 +63,7 @@ client.on('interactionCreate', async (interaction) => {
             content: "pong",
             ephemeral: true,
         })
-    } else if(commandName === "schedule-request"){
+    } else if(commandName === "check-day"){
 
         let weekday = options.getString('weekday')
         const timeFrame = options.getNumber('timeframe')
@@ -78,15 +75,13 @@ client.on('interactionCreate', async (interaction) => {
             })
         }
 
-        // let message = await getNextAvailableDates(weekday, timeFrame).then((availableDays) => {
-        //         let msg = "Vote for one of the following days:\n"
-        //         for(let i = 0; i < availableDays.length; i++){
-        //             msg += "> 1. " + availableDays[i]
-        //         }
-        //         return msg
-        //     })
-
-        let message = "Toma pila no cu"
+        let message = await getNextAvailableDates(weekday, timeFrame).then((availableDays) => {
+                let msg = "Vote for one of the following days:\n"
+                for(let i = 0; i < availableDays.length; i++){
+                    msg += `> ${i+1}. ${availableDays[i]} \n`
+                }
+                return msg
+            })
 
         interaction.reply({
             content: message,
@@ -95,14 +90,5 @@ client.on('interactionCreate', async (interaction) => {
     }
 })
 
-function getPossibleDays(weekday: any, timeFrame: any) {
 
-    if (weekday === "saturday" && timeFrame === 30){
-        return "The possible days are:\n\
-        > 2022-02-12";
-    } else {
-        return null;
-    }
-    
-}
 client.login(process.env.DISCORD_TOKEN)
